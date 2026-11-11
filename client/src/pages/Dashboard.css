@@ -1,0 +1,155 @@
+
+.dashboard-page {
+  background: #f4f8ff;
+  min-height: 85vh;
+  padding: 45px 6%;
+  box-sizing: border-box;
+}
+
+.dashboard-welcome {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  margin-bottom: 30px;
+}
+
+.dashboard-tag {
+  color: #087cf0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.dashboard-welcome h1 {
+  color: #102b4e;
+  margin: 10px 0;
+}
+
+.dashboard-welcome p {
+  color: #64748b;
+}
+
+.student-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #087cf0;
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  border: 1px solid #e5edf6;
+}
+
+.stat-card span {
+  font-size: 27px;
+}
+
+.stat-card h2 {
+  color: #087cf0;
+  margin: 12px 0 5px;
+}
+
+.stat-card p {
+  color: #64748b;
+  margin: 0;
+}
+
+.dashboard-section h2 {
+  color: #102b4e;
+}
+
+.dashboard-subtitle {
+  color: #64748b;
+  margin-bottom: 22px;
+}
+
+.learning-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.learning-card {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  border: 1px solid #e5edf6;
+}
+
+.learning-icon {
+  font-size: 35px;
+}
+
+.learning-card h3 {
+  color: #102b4e;
+  min-height: 48px;
+}
+
+.learning-card p {
+  color: #64748b;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0 10px;
+  color: #475569;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #e5edf6;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #087cf0;
+  border-radius: 10px;
+}
+
+.learning-card button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 22px;
+  background: #087cf0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .dashboard-stats,
+  .learning-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-welcome {
+    gap: 15px;
+  }
+
+  .dashboard-welcome h1 {
+    font-size: 22px;
+  }
+}

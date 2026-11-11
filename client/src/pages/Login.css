@@ -1,0 +1,150 @@
+
+.auth-page {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background: #f4f8ff;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 430px;
+  background: white;
+  padding: 38px;
+  border-radius: 18px;
+  box-shadow: 0 10px 35px rgba(20, 65, 110, 0.1);
+}
+
+.auth-logo {
+  color: #087cf0;
+  font-size: 25px;
+  font-weight: 800;
+  margin-bottom: 25px;
+}
+
+.auth-card h1 {
+  color: #102b4e;
+  margin-bottom: 10px;
+}
+
+.auth-card p {
+  color: #64748b;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  color: #334155;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px;
+  border: 1px solid #d5dfeb;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  border-color: #087cf0;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.forgot-password a {
+  color: #087cf0;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.auth-button {
+  width: 100%;
+  padding: 14px;
+  background: #087cf0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 25px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.auth-switch button {
+  background: none;
+  border: none;
+  color: #087cf0;
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 25px;
+  }
+}
+
+/* Login page spacing fix */
+
+.auth-page {
+  min-height: 75vh;
+  box-sizing: border-box;
+  padding: 60px 20px;
+  margin-top: 0;
+  position: relative;
+  clear: both;
+}
+
+.auth-card {
+  position: relative;
+  z-index: 1;
+  margin: 20px auto;
+}
+
+.auth-card h1 {
+  font-size: 28px;
+  line-height: 1.4;
+  margin-top: 0;
+  margin-bottom: 12px;
+  overflow-wrap: break-word;
+}
+
+.auth-card p {
+  line-height: 1.6;
+  margin-top: 0;
+}
+
+.auth-logo {
+  line-height: 1.4;
+}
+
+@media (max-width: 600px) {
+  .auth-page {
+    padding: 35px 15px;
+  }
+
+  .auth-card h1 {
+    font-size: 24px;
+  }
+}
