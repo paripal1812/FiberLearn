@@ -1,7 +1,11 @@
 
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const mongoose = require("mongoose");
 
 const app = express();
 
@@ -39,8 +43,17 @@ app.get("/api/courses", (req, res) => {
   });
 });
 
+// MongoDB Connection
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`FiberLearn server running on port ${PORT}`);
-});
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB Connected Successfully!");
+
+    app.listen(PORT, () => {
+      console.log(`FiberLearn server running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.log("MongoDB Connection Error:", error.message);
+  });
