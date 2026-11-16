@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,29 +7,122 @@ import {
   ScrollView,
   Pressable,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 
-const courses = [
-  { id: 1, title: 'Introduction to Fiber Optics', level: 'Beginner', duration: '2 Hours', icon: '📡', description: 'Learn the fundamentals of fiber optic technology and how light travels through optical fibers.', topics: ['Basics of Fiber Optics', 'How Optical Fibers Work', 'Applications of Fiber Optics'] },
-  { id: 2, title: 'Fiber Cable Types & Components', level: 'Beginner', duration: '3 Hours', icon: '🔌', description: 'Understand different fiber optic cables, their structures and important components.', topics: ['Single Mode and Multimode Cables', 'Cable Structure', 'Fiber Connectors'] },
-  { id: 3, title: 'Fiber Optic Splicing', level: 'Intermediate', duration: '4 Hours', icon: '🛠️', description: 'Explore the basic methods and tools used to join optical fibers.', topics: ['Fusion Splicing', 'Mechanical Splicing', 'Splicing Tools and Safety'] },
-  { id: 4, title: 'Fiber Installation', level: 'Intermediate', duration: '3 Hours', icon: '🏗️', description: 'Learn the basic process of planning and installing fiber optic cables.', topics: ['Installation Planning', 'Cable Handling', 'Installation Safety'] },
-  { id: 5, title: 'Testing & Troubleshooting', level: 'Advanced', duration: '5 Hours', icon: '🔬', description: 'Understand common fiber testing methods and how to identify network issues.', topics: ['Optical Power Testing', 'OTDR Basics', 'Common Fiber Faults'] },
-  { id: 6, title: 'FTTH & Telecom Infrastructure', level: 'Advanced', duration: '4 Hours', icon: '🌐', description: 'Discover how Fiber to the Home technology supports modern telecom networks.', topics: ['FTTH Architecture', 'PON Technology', 'Telecom Infrastructure'] },
+type Course = {
+  id: string | number;
+  title: string;
+  level: string;
+  duration: string;
+  icon: string;
+  description: string;
+  topics: string[];
+};
+
+type ApiCourse = {
+  _id?: string;
+  id?: string | number;
+  title?: string;
+  name?: string;
+  level?: string;
+  category?: string;
+  duration?: string;
+  description?: string;
+  topics?: string[];
+  icon?: string;
+};
+
+const API_URL = 'http://172.30.3.229:5000/api/courses';
+
+const courseIcons = ['📡', '🔌', '🛠️', '🏗️', '🔬', '🌐'];
+
+const defaultTopics = [
+  'Course Overview',
+  'Important Concepts',
+  'Practical Applications',
 ];
 
-type Course = (typeof courses)[number];
-
 export default function CoursesScreen() {
+  const [courses, setCourses] = useState<Course[]>([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        setError('');
+
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+          throw new Error('Unable to connect to the server.');
+        }
+
+        const result = await response.json();
+
+        if (!Array.isArray(result.courses)) {
+          throw new Error('Invalid course data received from server.');
+        }
+
+        const formattedCourses: Course[] = (
+          result.courses as ApiCourse[]
+        ).map((item, index) => ({
+          id: item._id ?? item.id ?? index + 1,
+          title: item.title ?? item.name ?? `Course ${index + 1}`,
+          level: item.level ?? item.category ?? 'Beginner',
+          duration: item.duration ?? 'Self-paced',
+          icon: item.icon ?? courseIcons[index % courseIcons.length],
+          description:
+            item.description ?? 'Explore this course and learn important concepts of fiber optic technology.',
+          topics:
+            Array.isArray(item.topics) && item.topics.length > 0
+              ? item.topics
+              : defaultTopics,
+        }));
+
+        if (isActive) {
+          setCourses(formattedCourses);
+        }
+      } catch (err) {
+        if (isActive) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : 'Something went wrong while loading courses.'
+          );
+        }
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchCourses();
+
+    return () => {
+      isActive = false;
+    };
+  }, [retryCount]);
 
   const filters = ['All', 'Beginner', 'Intermediate', 'Advanced'];
 
   const filteredCourses = courses.filter((course) => {
-    const matchesSearch = course.title.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = category === 'All' || course.level === category;
+    const matchesSearch = course.title
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const matchesCategory =
+      category === 'All' || course.level === category;
+
     return matchesSearch && matchesCategory;
   });
 
@@ -45,7 +138,7 @@ export default function CoursesScreen() {
           <Text style={styles.detailIcon}>{selectedCourse.icon}</Text>
           <Text style={styles.detailTitle}>{selectedCourse.title}</Text>
           <Text style={styles.detailMeta}>
-            {selectedCourse.level}  •  {selectedCourse.duration}
+            {selectedCourse.level} • {selectedCourse.duration}
           </Text>
         </View>
 
@@ -66,8 +159,12 @@ export default function CoursesScreen() {
 
           <View style={styles.infoCard}>
             <Text style={styles.infoTitle}>Course Information</Text>
-            <Text style={styles.infoText}>Level: {selectedCourse.level}</Text>
-            <Text style={styles.infoText}>Duration: {selectedCourse.duration}</Text>
+            <Text style={styles.infoText}>
+              Level: {selectedCourse.level}
+            </Text>
+            <Text style={styles.infoText}>
+              Duration: {selectedCourse.duration}
+            </Text>
             <Text style={styles.infoText}>Platform: FiberLearn</Text>
           </View>
         </ScrollView>
@@ -123,36 +220,55 @@ export default function CoursesScreen() {
         </ScrollView>
 
         <Text style={styles.count}>
-          {filteredCourses.length} Courses Available
+          {loading ? 'Loading Courses...' : `${filteredCourses.length} Courses Available`}
         </Text>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {filteredCourses.length > 0 ? (
-            filteredCourses.map((course) => (
-              <View key={course.id} style={styles.courseCard}>
-                <View style={styles.courseIcon}>
-                  <Text style={styles.icon}>{course.icon}</Text>
-                </View>
+        {loading ? (
+          <View style={styles.messageContainer}>
+            <ActivityIndicator size="large" color="#19B6C9" />
+            <Text style={styles.messageText}>Fetching courses...</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.messageContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <Pressable
+              style={styles.retryButton}
+              onPress={() => setRetryCount((count) => count + 1)}
+            >
+              <Text style={styles.retryText}>Try Again</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {filteredCourses.length > 0 ? (
+              filteredCourses.map((course) => (
+                <View key={course.id} style={styles.courseCard}>
+                  <View style={styles.courseIcon}>
+                    <Text style={styles.icon}>{course.icon}</Text>
+                  </View>
 
-                <View style={styles.courseInfo}>
-                  <Text style={styles.courseTitle}>{course.title}</Text>
-                  <Text style={styles.courseMeta}>
-                    {course.level} • {course.duration}
-                  </Text>
+                  <View style={styles.courseInfo}>
+                    <Text style={styles.courseTitle}>{course.title}</Text>
+                    <Text style={styles.courseMeta}>
+                      {course.level} • {course.duration}
+                    </Text>
 
-                  <Pressable
-                    style={styles.detailsButton}
-                    onPress={() => setSelectedCourse(course)}
-                  >
-                    <Text style={styles.detailsText}>View Details →</Text>
-                  </Pressable>
+                    <Pressable
+                      style={styles.detailsButton}
+                      onPress={() => setSelectedCourse(course)}
+                    >
+                      <Text style={styles.detailsText}>
+                        View Details →
+                      </Text>
+                    </Pressable>
+                  </View>
                 </View>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.empty}>No courses found.</Text>
-          )}
-        </ScrollView>
+              ))
+            ) : (
+              <Text style={styles.empty}>No courses found.</Text>
+            )}
+          </ScrollView>
+        )}
       </View>
     </View>
   );
@@ -168,7 +284,12 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   logo: { color: '#41D2D8', fontSize: 17, fontWeight: 'bold' },
-  heading: { color: '#FFFFFF', fontSize: 27, fontWeight: 'bold', marginTop: 18 },
+  heading: {
+    color: '#FFFFFF',
+    fontSize: 27,
+    fontWeight: 'bold',
+    marginTop: 18,
+  },
   subtitle: { color: '#B9D4E8', fontSize: 13, marginTop: 7 },
 
   content: { flex: 1, paddingHorizontal: 18, paddingTop: 20 },
@@ -234,6 +355,31 @@ const styles = StyleSheet.create({
   },
   detailsText: { color: '#159EB2', fontSize: 12, fontWeight: 'bold' },
   empty: { textAlign: 'center', color: '#8492A5', marginTop: 35 },
+
+  messageContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  messageText: {
+    color: '#52647A',
+    marginTop: 12,
+    fontSize: 14,
+  },
+  errorText: {
+    color: '#D64545',
+    textAlign: 'center',
+    fontSize: 14,
+    marginBottom: 15,
+  },
+  retryButton: {
+    backgroundColor: '#19B6C9',
+    paddingHorizontal: 22,
+    paddingVertical: 11,
+    borderRadius: 8,
+  },
+  retryText: { color: '#FFFFFF', fontWeight: 'bold' },
 
   // Details screen styles
   detailHeader: {
